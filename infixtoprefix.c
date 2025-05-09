@@ -76,7 +76,7 @@ int main() {
     char infix[MAX], prefix[MAX];
 
     printf("Enter infix expression: ");
-    scanf("%s ", infix);
+    scanf("%s", infix);
 
     infixToPrefix(infix, prefix);
 
