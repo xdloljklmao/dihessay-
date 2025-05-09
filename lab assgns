@@ -1,0 +1,1507 @@
+1. Generate Minimum Spanning Tree Using Prims Algorithm when Graph is Represented
+using A. Adjacency Matrix. B. Adjacency Lists.
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#define MAX 100
+int graph[MAX][MAX];
+int visited[MAX];
+int parent[MAX];
+int weight[MAX];
+// for Adj LIST
+struct Node {
+    int vertex;
+    int weight;
+    struct Node* next;
+};
+struct Node* adjList[MAX];
+char letter(int v) {
+    return &#39;A&#39; + v;
+}
+int selectMinV(int vertices) {
+    int min = INT_MAX, vertex = -1;
+    for (int i = 0; i < vertices; i++) {
+        if (!visited[i] && weight[i] < min) {
+            min = weight[i];
+            vertex = i;
+        }
+    }
+    return vertex;
+}
+//adj matrix
+void primMatrix(int vertices) {
+    for (int i = 0; i < vertices; i++) {
+        weight[i] = INT_MAX;
+        visited[i] = 0;
+        parent[i] = -1;
+    }
+    weight[0] = 0;
+    printf(“\nEdge with minimum length = %c-%c\n”, letter(0), letter(0));
+    printf(“Starting Node -> %c\n”, letter(0));
+    for (int count = 0; count < vertices - 1; count++) {
+
+        int u = selectMinV(vertices);
+        visited[u] = 1;
+        printf(“\nStep %d\n”, count + 1);
+        printf(“Visited Nodes: { “);
+        for (int i = 0; i < vertices; i++) {
+            if (visited[i]) printf(“%c “, letter(i));
+        }
+        printf(“}\n”);
+        printf(“Remaining Edges from Visited Nodes:\n”);
+        for (int i = 0; i < vertices; i++) {
+            if (visited[i]) {
+                for (int j = 0; j < vertices; j++) {
+                    if (!visited[j] && graph[i][j] != 0) {
+                        printf(“%c-%c length = %d\n”, letter(i), letter(j), graph[i][j]);
+                    }
+                }
+            }
+        }
+        for (int v = 0; v < vertices; v++) {
+            if (graph[u][v] && !visited[v] && graph[u][v] < weight[v]) {
+                weight[v] = graph[u][v];
+                parent[v] = u;
+            }
+        }
+    }
+    printf(“\nMinimum Spanning Tree Edges:\n”);
+    int totalWeight = 0;
+    for (int i = 1; i < vertices; i++) {
+        printf(“%c - %c : %d\n”, letter(parent[i]), letter(i), graph[i][parent[i]]);
+        totalWeight += graph[i][parent[i]];
+    }
+    printf(“\nTotal Edge Weight of MST = %d\n”, totalWeight);
+}
+void edgeList(int u, int v, int w) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = v;
+    newNode->weight = w;
+    newNode->next = adjList[u];
+    adjList[u] = newNode;
+    newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = u;
+    newNode->weight = w;
+    newNode->next = adjList[v];
+    adjList[v] = newNode;
+}
+// adj list
+void primList(int vertices) {
+    for (int i = 0; i < vertices; i++) {
+        weight[i] = INT_MAX;
+        visited[i] = 0;
+        parent[i] = -1;
+    }
+    weight[0] = 0;
+    printf(“\nEdge with minimum length = %c-%c\n”, letter(0), letter(0));
+    printf(“Starting Node -> %c\n”, letter(0));
+    for (int count = 0; count < vertices - 1; count++) {
+        int u = selectMinV(vertices);
+
+        visited[u] = 1;
+        printf(“\nStep %d\n”, count + 1);
+        printf(“Visited Nodes: { “);
+        for (int i = 0; i < vertices; i++) {
+            if (visited[i]) printf(“%c “, letter(i));
+        }
+        printf(“}\n”);
+        printf(“Remaining Edges from Visited Nodes:\n”);
+        for (int i = 0; i < vertices; i++) {
+            if (visited[i]) {
+                struct Node* temp = adjList[i];
+                while (temp) {
+                    if (!visited[temp->vertex]) {
+                        printf(“%c-%c length = %d\n”, letter(i), letter(temp->vertex), temp->weight);
+                    }
+                    temp = temp->next;
+                }
+            }
+        }
+        struct Node* temp = adjList[u];
+        while (temp) {
+            int v = temp->vertex;
+            if (!visited[v] && temp->weight < weight[v]) {
+                weight[v] = temp->weight;
+                parent[v] = u;
+            }
+            temp = temp->next;
+        }
+    }
+    printf(“\nMinimum Spanning Tree Edges:\n”);
+    int totalWeight = 0;
+    for (int i = 1; i < vertices; i++) {
+        struct Node* temp = adjList[i];
+        while (temp) {
+            if (temp->vertex == parent[i]) {
+                printf(“%c - %c : %d\n”, letter(parent[i]), letter(i), temp->weight);
+                totalWeight += temp->weight;
+                break;
+            }
+            temp = temp->next;
+        }
+    }
+    printf(“\nTotal Edge Weight of MST = %d\n”, totalWeight);
+}
+int main() {
+    int vertices, edges, w, choice;
+    char startChar, endChar;
+    for (int i = 0; i < MAX; i++) adjList[i] = NULL;
+    printf(“Enter number of vertices: “);
+    scanf(“%d”, &vertices);
+    printf(“Enter number of edges: “);
+    scanf(“%d”, &edges);
+    for (int i = 0; i < vertices; i++)
+        for (int j = 0; j < vertices; j++)
+            graph[i][j] = 0;
+
+    for (int i = 0; i < edges; i++) {
+        printf(“\nEdge %d:\n”, i + 1);
+        printf(“Enter start vertex (A, B, C...): “);
+        scanf(“ %c”, &startChar);
+        printf(“Enter end vertex (A, B, C...): “);
+        scanf(“ %c”, &endChar);
+        printf(“Enter edge weight: “);
+        scanf(“%d”, &w);
+        int u = startNode- &#39;A&#39;;
+        int v = endNode- &#39;A&#39;;
+        graph[u][v] = w;
+        graph[v][u] = w;
+        edgeList(u, v, w);
+    }
+    do {
+        printf(“\nMenu:\n”);
+        printf(“1. Generate MST using Adjacency Matrix\n”);
+        printf(“2. Generate MST using Adjacency List\n”);
+        printf(“3. Exit\n”);
+        printf(“Enter your choice: “);
+        scanf(“%d”, &choice);
+        switch (choice) {
+            case 1:
+                primMatrix(vertices);
+                break;
+            case 2:
+                primList(vertices);
+                break;
+            case 3:
+                printf(“Exiting...\n”);
+                break;
+            default:
+                printf(“Invalid choice. Try again.\n”);
+        }
+    } while (choice != 3);
+    return 0;
+
+2. Generate Minimum Spanning Tree Using Kruskals Algorithm when Graph is
+Represented using A. Adjacency Matrix. B. Adjacency Lists.
+CODE:
+#include <stdio.h>
+int num_edges =1;
+int par[10];
+int G[10][10];
+int findparent(int);
+int Union(int, int);
+int findparent(int i){
+while(i!=par[i]){
+i=par[i];
+}
+return i;
+}
+int Union(int i, int j){
+if (i!=j){
+par[j]=i;
+return 1;
+}
+return 0;
+}
+int main (){
+int min = 99;
+int n, i , j, minW =0;
+int choice;
+printf(“Choose graph input method:\n1. Adjacency Matrix\n2. Adjacency List\n”);
+scanf(“%d”, &choice);
+printf(“Enter the number of vertices: \n”);
+scanf(“%d”, &n);
+for (i = 0; i < n; i++) {
+par[i] = i;
+}
+if (choice == 1){
+printf(“Enter the adjacency matrix: \n”);
+for (i=0; i<n; i++){
+for (j=0; j<n; j++){
+scanf(“%d”, &G[i][j]);
+}
+
+}
+}
+else if (choice == 2){
+int edges, u, v, w;
+printf(“Enter the number of edges: \n”);
+scanf(“%d”, &edges);
+for (i=0;i<n;i++){
+for (j=0;j<n;j++){
+G[i][j]=99;
+}
+}
+printf(“Enter edges in format: u v weight\n”);
+for (i=0; i<edges; i++){
+scanf(“%d%d%d”, &u, &v, &w);
+G[u][v] = w;
+G[v][u] = w;
+}
+}
+else{
+printf(“Invalid choice!\n”);
+return 0;
+}
+int u, v, a, b;
+while (num_edges < n){
+for (i=0, min = 99; i<n; i++){
+for (j=0; j<n; j++){
+if (G[i][j] < min){
+min = G[i][j];
+a = u = i;
+b = v = j;
+}
+}
+}
+u = findparent(u);
+v = findparent(v);
+if(Union(u,v)){
+minW += min;
+printf(“%d Edge :- %d - %d -> %d\n”, num_edges, a, b, min);
+num_edges++;
+}
+G[a][b]=G[b][a] = 99;
+}
+printf(“MST weight: %d\n”, minW);
+return 0;
+}
+
+3. Implement following problems based on Arrays.
+A. a. i/p- { 2,2,3,4} o/p: 1
+b. i/p: {1,3,2,5,4,9} o/p: 3
+c. i/p: { 1,5,3,4,6,2,12} o/p: 5
+B. Find saddle point in the Matrix.
+C. Magic square Matrix. (Check)
+D. Represent given matrix in its Sparse form.
+CODE:
+A.
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+int i, n;
+int actSum=0;
+int expSum=0;
+int output=0;
+printf(“Enter size of array: “);
+scanf(“%d”, &n);
+int arr[n];
+printf(“Enter %d elements in the array: “);
+for (i=0;i<n;i++){
+    printf(“Element %d: “, i+1);
+    scanf(“%d”, &arr[i]);
+}
+    printf(“Array is: “);
+    for (i=0;i<n;i++){
+        printf(“%d “, arr[i]);    }
+        printf(“\n\n\n”);
+for (i=0;i<n;i++){
+    actSum+=arr[i]; //actual sum of elements inputted in the array
+}
+expSum=n*(n+1)/2; // sum from 1 to n
+output= actSum-expSum;
+
+printf(“The output is: %d”, output);
+}
+B.
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX 100
+//FUNC to find saddle point
+// min in row max in column
+bool SadPt (int mat[MAX][MAX], int n) { //n is size of matrix
+for (int i=0; i<n; i++) //repeat for each row i
+{
+int minRow = mat[i][0], col=0; // intialised the row to first element of the matrice
+for (int j=0; j<n; j++) // iterate thru each col of that row
+{
+if (minRow > mat[i][j]) // smaller value is assigned to minrow
+{
+minRow = mat[i][j]; //minrow becomes smallest value
+col=j; // column val changed to that of minimum val in row
+}
+}
+
+int a; // rows of the col
+for (a=0; a<n;a++) // increment in rows
+if (minRow < mat[a][col]) //compare with every element
+break;
+
+if (a ==n)
+{
+printf(“Saddle Point is: %d”, minRow);
+return true;
+}
+}
+
+return false;
+}
+
+C.
+#include <stdio.h>
+#include <stdbool.h>
+
+// magic square
+// sum of any row col or diagonal is same
+
+bool MagSq(int mat[3][3]) {
+int n = 3;
+
+int diagSum1= 0;
+for (int i = 0; i < n; i++) {
+diagSum1+= mat[i][i];
+}
+int diagSum2 = 0;
+for (int i = 0; i < n; i++) {
+diagSum2 += mat[i][n - 1 - i];
+}
+
+if (diagSum1!= diagSum2) {
+return false;
+}
+for (int i = 0; i < n; i++) { // Checking sum of each row and column
+int rowSum = 0, colSum = 0;
+
+for (int j = 0; j < n; j++) {
+rowSum += mat[i][j]; // Sum of the i&#39;th row
+colSum += mat[j][i]; // Sum of the i&#39;th column
+}
+
+if (rowSum != diagSum1|| colSum != sumDiagonal1) { // If row/col sum not equal to
+diagonal sum, false
+return false;
+}
+}
+return true;
+}
+
+D.
+#include <stdio.h>
+#include <stdlib.h>
+
+void convertSparse (int rows, int cols, int arr[rows][cols])
+{
+int counter =0;
+
+printf(“Row\tColumn\tValue\n”);
+
+for (int i=0;i<rows;i++)
+{
+for (int j=0;j<cols;j++)
+{
+if (arr[i][j] != 0)
+{
+printf (“%d\t%d\t%d\n”, i,j, arr[i][j]);
+counter++;
+}
+}
+}
+}
+
+void checkSparse (int rows, int cols, int arr[rows][cols])
+{
+
+int countZero = 0;
+int NonZero = 0;
+int totalElements = rows*cols;
+for (int i = 0; i < rows; i++)
+{
+for (int j = 0; j < cols; j++)
+{
+if (arr[i][j]==0)
+countZero++;
+else
+{
+NonZero++;
+}
+}
+}
+if (countZero>NonZero)
+{
+printf(“Sparse Matrix\n”);
+convertSparse (rows, cols, arr);
+}
+else
+{
+printf(“Not a Sparse Matrix\n”);
+}
+}
+
+int main()
+{
+int rows, cols;
+printf (“\nNo. of rows: “);
+scanf(“%d”,&rows);
+printf (“\nNo. of columns: “);
+scanf(“%d”,&cols);
+
+int arr[rows][cols];
+
+for (int i=0;i<rows;i++)
+{
+for (int j=0;j<cols;j++)
+{
+printf(“Enter element for [%d][%d]: “, i+1, j+1);
+scanf(“%d”, &arr[i][j]);
+}
+}
+checkSparse(rows, cols, arr);
+return 0;
+}
+4. WAP to implement Heap sort, Merge Sort, Bubble Sort and Quick Sort on 1D array
+of Student structure (contains student_name, student_roll_no, total_marks ), with key
+as student_roll_no. and count the number of swap performed.
+
+1. Quicksort
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+char student_name[50];
+int student_roll_no;
+float total_marks;
+} Student;
+
+void swap(Student* a, Student* b, int* swap_count) {
+Student temp = *a;
+*a = *b;
+*b = temp;
+(*swap_count)++;
+}
+
+// Partition function for student struct
+int partition(Student arr[], int low, int high, int* swap_count) {
+
+int pivot = arr[high].student_roll_no;
+
+int i = low - 1;
+
+// go thru and move all smaller elements to the left side
+for (int j = low; j <= high - 1; j++) {
+if (arr[j].student_roll_no < pivot) {
+i++;
+swap(&arr[i], &arr[j], swap_count);
+}
+}
+swap(&arr[i + 1], &arr[high], swap_count);
+return i + 1;
+}
+
+// QuickSort function implementation
+void quickSort(Student arr[], int low, int high, int* swap_count) {
+if (low < high) {
+// part_ind partition index of pivot
+int part_ind = partition(arr, low, high, swap_count);
+
+quickSort(arr, low, part_ind - 1, swap_count);
+quickSort(arr, part_ind + 1, high, swap_count);
+}
+}
+
+int main() {
+
+Student students[] = {
+{“Ram”, 102, 82},
+{“Kailash”, 101, 90},
+{“Kritika”, 104, 79},
+{“Meher”, 103, 81}
+};
+
+int n = sizeof(students) / sizeof(students[0]);
+int swap_count = 0;
+
+quickSort(students, 0, n - 1, &swap_count);
+
+// sorted array
+printf(“Sorted Students by Roll Number:\n”);
+for (int i = 0; i < n; i++) {
+printf(“Name: %s, Roll No: %d, Total Marks: %.2f\n”,
+students[i].student_name,
+students[i].student_roll_no,
+students[i].total_marks);
+}
+printf(“Total no. of swaps performed: %d\n”, swap_count);
+return 0;
+}
+
+2. Heap Sort
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+char student_name[50];
+int student_roll_no;
+float total_marks;
+} Student;
+
+void swap(Student* a, Student* b, int* swap_count) {
+Student temp = *a;
+*a = *b;
+*b = temp;
+(*swap_count)++;
+}
+
+void heapify(Student arr[], int n, int i, int* swap_count) {
+int largest = i;
+int left = 2 * i + 1;
+int right = 2 * i + 2;
+
+if (left < n && arr[left].student_roll_no > arr[largest].student_roll_no)
+largest = left;
+
+if (right < n && arr[right].student_roll_no > arr[largest].student_roll_no)
+largest = right;
+
+if (largest != i) {
+swap(&arr[i], &arr[largest], swap_count);
+heapify(arr, n, largest, swap_count);
+}
+
+}
+
+void heapSort(Student arr[], int n, int* swap_count) {
+for (int i = n / 2 - 1; i >= 0; i--)
+heapify(arr, n, i, swap_count);
+
+for (int i = n - 1; i > 0; i--) {
+swap(&arr[0], &arr[i], swap_count);
+heapify(arr, i, 0, swap_count);
+}
+}
+
+int main() {
+Student students[] = {
+{“Ram”, 102, 82},
+{“Kailash”, 101, 90},
+{“Kritika”, 104, 79},
+{“Meher”, 103, 81}
+
+};
+
+int n = sizeof(students) / sizeof(students[0]);
+int swap_count = 0;
+
+heapSort(students, n, &swap_count);
+
+printf(“Sorted Students by Roll Number:\n”);
+for (int i = 0; i < n; i++) {
+
+printf(“Name: %s, Roll No: %d, Total Marks: %.2f\n”,
+students[i].student_name,
+students[i].student_roll_no,
+students[i].total_marks);
+}
+printf(“Total number of swaps performed: %d\n”, swap_count);
+return 0;
+}
+3. Merge Sort
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+char student_name[50];
+int student_roll_no;
+float total_marks;
+} Student;
+
+void merge(Student arr[], int l, int m, int r, int* swap_count) {
+int n1 = m - l + 1;
+int n2 = r - m;
+
+Student L[n1], R[n2];
+
+for (int i = 0; i < n1; i++)
+L[i] = arr[l + i];
+for (int j = 0; j < n2; j++)
+R[j] = arr[m + 1 + j];
+
+int i = 0, j = 0, k = l;
+
+while (i < n1 && j < n2) {
+if (L[i].student_roll_no <= R[j].student_roll_no) {
+arr[k] = L[i];
+i++;
+} else {
+arr[k] = R[j];
+j++;
+(*swap_count)++; // Count mismatched positions as swaps
+}
+k++;
+}
+
+while (i < n1) {
+arr[k] = L[i];
+i++;
+k++;
+}
+
+while (j < n2) {
+arr[k] = R[j];
+j++;
+k++;
+}
+}
+
+void mergeSort(Student arr[], int l, int r, int* swap_count) {
+if (l < r) {
+int m = l + (r - l) / 2;
+
+mergeSort(arr, l, m, swap_count);
+mergeSort(arr, m + 1, r, swap_count);
+
+merge(arr, l, m, r, swap_count);
+}
+}
+
+int main() {
+Student students[] = {
+{“Ram”, 102, 82},
+{“Kailash”, 101, 90},
+{“Kritika”, 104, 79},
+{“Meher”, 103, 81}
+};
+
+int n = sizeof(students) / sizeof(students[0]);
+int swap_count = 0;
+
+mergeSort(students, 0, n - 1, &swap_count);
+
+printf(“Sorted Students by Roll Number:\n”);
+for (int i = 0; i < n; i++) {
+printf(“Name: %s, Roll No: %d, Total Marks: %.2f\n”,
+students[i].student_name,
+
+students[i].student_roll_no,
+students[i].total_marks);
+}
+
+printf(“Total number of swaps performed: %d\n”, swap_count);
+
+return 0;
+}
+4. Bubble Sort
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+char student_name[50];
+int student_roll_no;
+float total_marks;
+} Student;
+
+void bubbleSort(Student arr[], int n, int* swap_count) {
+for (int i = 0; i < n - 1; i++) {
+for (int j = 0; j < n - i - 1; j++) {
+if (arr[j].student_roll_no > arr[j + 1].student_roll_no) {
+Student temp = arr[j];
+arr[j] = arr[j + 1];
+arr[j + 1] = temp;
+(*swap_count)++;
+}
+}
+
+}
+}
+
+int main() {
+Student students[] = {
+{“Ram”, 102, 82},
+{“Kailash”, 101, 90},
+{“Kritika”, 104, 79},
+{“Meher”, 103, 81}
+};
+
+int n = sizeof(students) / sizeof(students[0]);
+int swap_count = 0;
+
+bubbleSort(students, n, &swap_count);
+
+printf(“Sorted Students by Roll Number:\n”);
+for (int i = 0; i < n; i++) {
+printf(“Name: %s, Roll No: %d, Total Marks: %.2f\n”,
+students[i].student_name,
+students[i].student_roll_no,
+students[i].total_marks);
+}
+
+printf(“Total number of swaps performed: %d\n”, swap_count);
+
+return 0;
+}
+5. Q. Implement SLL and DLL for following operations. a. Create. b. Insert. c. Delete. d.
+Display. e. Reverse.
+SLL
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+int data;
+struct Node* next;
+};
+struct Node* createNode(int value) {
+struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+newNode->data = value;
+newNode->next = NULL;
+return newNode;
+}
+
+// Insert
+void insert(struct Node** head, int value) {
+struct Node* newNode = createNode(value);
+
+if (*head == NULL) {
+*head = newNode;
+return;
+}
+
+struct Node* temp = *head;
+while (temp->next != NULL)
+temp = temp->next;
+
+temp->next = newNode;
+}
+
+// Delete
+void deleteNode(struct Node** head, int value) {
+struct Node* temp = *head, *prev = NULL;
+
+if (temp != NULL && temp->data == value) {
+*head = temp->next;
+free(temp);
+return;
+}
+
+while (temp != NULL && temp->data != value) {
+prev = temp;
+temp = temp->next;
+}
+
+if (temp == NULL) return;
+
+prev->next = temp->next;
+free(temp);
+}
+
+// Display
+void display(struct Node* head) {
+struct Node* temp = head;
+while (temp != NULL) {
+printf(“%d -> “, temp->data);
+temp = temp->next;
+}
+printf(“NULL\n”);
+}
+
+// Reverse
+void reverse(struct Node** head) {
+struct Node *prev = NULL, *current = *head, *next = NULL;
+
+while (current != NULL) {
+next = current->next;
+current->next = prev;
+prev = current;
+current = next;
+}
+
+*head = prev;
+}
+
+// testing
+int main() {
+struct Node* head = NULL;
+
+insert(&head, 10);
+insert(&head, 20);
+insert(&head, 30);
+printf(“SLL: “);
+display(head);
+
+deleteNode(&head, 20);
+printf(“After deleting 20: “);
+display(head);
+
+reverse(&head);
+printf(“Reversed Linked List: “);
+display(head);
+
+return 0;
+}
+
+DLL
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+int data;
+struct Node* prev;
+struct Node* next;
+};
+struct Node* createNode(int value) {
+struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+newNode->data = value;
+newNode->prev = NULL;
+newNode->next = NULL;
+return newNode;
+}
+
+// Insert a node at end
+void insert(struct Node** head, int value) {
+struct Node* newNode = createNode(value);
+if (*head == NULL) {
+*head = newNode;
+return;
+}
+
+struct Node* temp = *head;
+while (temp->next != NULL)
+temp = temp->next;
+
+temp->next = newNode;
+newNode->prev = temp;
+
+}
+
+// Delete
+void deleteNode(struct Node** head, int value) {
+struct Node* temp = *head;
+
+while (temp != NULL && temp->data != value)
+temp = temp->next;
+
+if (temp == NULL) return; // Value not found
+
+if (temp->prev != NULL)
+temp->prev->next = temp->next;
+else
+*head = temp->next;
+
+if (temp->next != NULL)
+temp->next->prev = temp->prev;
+
+free(temp);
+}
+
+// Display
+void display(struct Node* head) {
+struct Node* temp = head;
+while (temp != NULL) {
+printf(“%d <-> “, temp->data);
+
+temp = temp->next;
+}
+printf(“NULL\n”);
+}
+
+// Reverse
+void reverse(struct Node** head) {
+struct Node *temp = NULL, *current = *head;
+
+while (current != NULL) {
+temp = current->prev;
+current->prev = current->next;
+current->next = temp;
+current = current->prev;
+}
+
+if (temp != NULL)
+*head = temp->prev;
+}
+int main() {
+struct Node* head = NULL;
+
+insert(&head, 10);
+insert(&head, 20);
+insert(&head, 30);
+printf(“DLL: “);
+display(head);
+
+deleteNode(&head, 20);
+printf(“After deleting 20: “);
+display(head);
+
+reverse(&head);
+printf(“Reversed DLL: “);
+display(head);
+
+return 0;}
+6. Implement a Polynomial addition and multiplication using Linked Lists.
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+int coeff;
+int power;
+struct Node *next;
+};
+int main() {
+struct Node *head1 = NULL, *head2 = NULL, *head3 = NULL, *p, *q, *r;
+int i, n1, n2, coeff, power;
+// Polynomial 1
+printf(“Enter the number of terms in polynomial 1: “);
+scanf(“%d”, &n1);
+for (i = 0; i < n1; i++) {
+p = (struct Node*)malloc(sizeof(struct Node));
+printf(“Enter coefficient and power for term %d: “, i + 1);
+scanf(“%d %d”, &p->coeff, &p->power);
+p->next = NULL;
+if (head1 == NULL) {
+head1 = p;
+} else {
+q = head1;
+while (q->next != NULL) {
+q = q->next;
+}
+q->next = p;
+}
+}
+// Polynomial 2
+printf(“Enter the number of terms in polynomial 2: “);
+scanf(“%d”, &n2);
+for (i = 0; i < n2; i++) {
+
+p = (struct Node*)malloc(sizeof(struct Node));
+printf(“Enter coefficient and power for term %d: “, i + 1);
+scanf(“%d %d”, &p->coeff, &p->power);
+p->next = NULL;
+if (head2 == NULL) {
+head2 = p;
+} else {
+q = head2;
+while (q->next != NULL) {
+q = q->next;
+}
+q->next = p;
+}
+}
+// Polynomial Addition
+struct Node *t1 = head1, *t2 = head2;
+while (t1 != NULL || t2 != NULL) {
+p = (struct Node*)malloc(sizeof(struct Node));
+p->next = NULL;
+if (t1 != NULL && (t2 == NULL || t1->power > t2->power)) {
+p->coeff = t1->coeff;
+p->power = t1->power;
+t1 = t1->next;
+} else if (t2 != NULL && (t1 == NULL || t2->power > t1->power)) {
+p->coeff = t2->coeff;
+p->power = t2->power;
+t2 = t2->next;
+} else {
+p->coeff = t1->coeff + t2->coeff;
+p->power = t1->power;
+t1 = t1->next;
+t2 = t2->next;
+}
+if (head3 == NULL) {
+head3 = p;
+} else {
+q = head3;
+while (q->next != NULL) {
+q = q->next;
+}
+q->next = p;
+}
+}
+
+printf(“Sum of polynomials: “);
+q = head3;
+while (q != NULL) {
+printf(“%dx^%d”, q->coeff, q->power);
+if (q->next != NULL) printf(“ + “);
+q = q->next;
+}
+printf(“\n”);
+// Polynomial Multiplication
+struct Node *head4 = NULL;
+for (t1 = head1; t1 != NULL; t1 = t1->next) {
+for (t2 = head2; t2 != NULL; t2 = t2->next) {
+p = (struct Node*)malloc(sizeof(struct Node));
+p->coeff = t1->coeff * t2->coeff;
+p->power = t1->power + t2->power;
+p->next = NULL;
+if (head4 == NULL) {
+head4 = p;
+} else {
+q = head4;
+while (q->next != NULL) {
+q = q->next;
+}
+q->next = p;
+}
+}
+}
+printf(“Product of polynomials: “);
+q = head4;
+while (q != NULL) {
+printf(“%dx^%d”, q->coeff, q->power);
+if (q->next != NULL) printf(“ + “);
+q = q->next;
+}
+printf(“\n”);
+return 0;
+}
+7. WAP to convert given Infix expression into its Equivalent Prefix and
+Postfix form using Stack.
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX 100
+char stack[MAX];
+int top = -1;
+void push(char c) {
+if (top < MAX - 1) {
+stack[++top] = c;
+}
+}
+char pop() {
+if (top >= 0) {
+return stack[top--];
+}
+return &#39;\0&#39;;
+}
+int precedence(char c) {
+if (c == &#39;+&#39; || c == &#39;-&#39;) return 1;
+if (c == &#39;*&#39; || c == &#39;/&#39;) return 2;
+return 0;
+}
+void infixToPostfix(char *infix, char *postfix) {
+int j = 0;
+for (int i = 0; infix[i] != &#39;\0&#39;; i++) {
+char c = infix[i];
+if (isalnum(c)) {
+postfix[j++] = c;
+
+} else if (c == &#39;(&#39;) {
+push(c);
+} else if (c == &#39;)&#39;) {
+while (top >= 0 && stack[top] != &#39;(&#39;) {
+postfix[j++] = pop();
+}
+pop(); // Remove &#39;(&#39;
+} else {
+while (top >= 0 && precedence(stack[top]) >= precedence(c)) {
+postfix[j++] = pop();
+}
+push(c);
+}
+}
+while (top >= 0) {
+postfix[j++] = pop();
+}
+postfix[j] = &#39;\0&#39;;
+}
+void reverse(char *str) {
+int n = strlen(str);
+for (int i = 0; i < n / 2; i++) {
+char temp = str[i];
+str[i] = str[n - i - 1];
+str[n - i - 1] = temp;
+}
+}
+void infixToPrefix(char *infix, char *prefix) {
+reverse(infix);
+for (int i = 0; infix[i] != &#39;\0&#39;; i++) {
+if (infix[i] == &#39;(&#39;) infix[i] = &#39;)&#39;;
+else if (infix[i] == &#39;)&#39;) infix[i] = &#39;(&#39;;
+}
+infixToPostfix(infix, prefix);
+reverse(prefix);
+}
+int main() {
+char infix[MAX], postfix[MAX], prefix[MAX];
+printf(“Enter infix expression: “);
+scanf(“%s”, infix);
+
+infixToPostfix(infix, postfix);
+infixToPrefix(infix, prefix);
+printf(“Postfix: %s\n”, postfix);
+printf(“Prefix: %s\n”, prefix);
+return 0;}
+8. An operating system assigns job to print queues based on the number of pages to be printed (1 to
+50 pages). You may assume that the system printers are able to print 10 pages per minute. Smaller
+print jobs are printed before larger print jobs and print jobs are processed from a single print queue
+implemented as a priority queue). The system administrators would like to compare the time required to process a set of print jobs using 1, 2, or 3 system printers. Write a program which simulates processing 100 print jobs of varying lengths using 1, 2, or 3 printers. Assume that a print request is made every minute and that the number of pages to print varies from 1 to 50 pages. To be fair, you will need to process the same set of print jobs each time you add a printer. The output from your program should indicate the order in which the jobs were received, the order in which they were printed, and the time required to process the set of print jobs. If more than one printer is being used, indicate which printer each job was printed on.
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define TOTAL_JOBS 100
+#define MAX_PAGES 50
+#define PRINT_SPEED 10
+typedef struct {
+int id;
+int pages;
+int arrival_time;
+} PrintJob;
+void swap(PrintJob *a, PrintJob *b) {
+PrintJob temp = *a;
+*a = *b;
+*b = temp;
+}
+void heapify(PrintJob jobs[], int jobCount, int i) {
+int smallest = i;
+int left = 2 * i + 1;
+int right = 2 * i + 2;
+if (left < jobCount && jobs[left].pages < jobs[smallest].pages)
+smallest = left;
+if (right < jobCount && jobs[right].pages < jobs[smallest].pages)
+smallest = right;
+
+if (smallest != i) {
+swap(&jobs[i], &jobs[smallest]);
+heapify(jobs, jobCount, smallest);
+}
+}
+PrintJob extractMin(PrintJob jobs[], int *jobCount) {
+PrintJob minJob = jobs[0];
+jobs[0] = jobs[*jobCount - 1];
+(*jobCount)--;
+heapify(jobs, *jobCount, 0);
+return minJob;
+}
+void insert(PrintJob jobs[], int *jobCount, PrintJob job) {
+int i = *jobCount;
+jobs[i] = job;
+(*jobCount)++;
+while (i > 0) {
+int parent = (i - 1) / 2;
+if (jobs[parent].pages <= jobs[i].pages)
+break;
+swap(&jobs[i], &jobs[parent]);
+i = parent;
+}
+}
+void PrintSim(int numPrinters) {
+PrintJob jobs[TOTAL_JOBS];
+int jobCount = 0;
+int currentTime = 0;
+int printers[numPrinters];
+for (int i = 0; i < numPrinters; i++)
+printers[i] = 0;
+srand(time(NULL));
+for (int i = 0; i < TOTAL_JOBS; i++) {
+PrintJob job = {i + 1, (rand() % MAX_PAGES) + 1, i};
+insert(jobs, &jobCount, job);
+}
+printf("\nSimulating with %d printer(s):\n", numPrinters);
+while (jobCount > 0) {
+for (int i = 0; i < numPrinters; i++) {
+if (printers[i] == 0 && jobCount > 0) {
+PrintJob job = extractMin(jobs, &jobCount);
+
+int printTime = (job.pages + PRINT_SPEED - 1) / PRINT_SPEED;
+printers[i] = printTime;
+printf("Time %d: Job %d (%d pages) printed on Printer %d, finishes at time %d\n",
+currentTime, job.id, job.pages, i + 1, currentTime + printTime);
+}
+}
+for (int i = 0; i < numPrinters; i++)
+if (printers[i] > 0)
+printers[i]--;
+currentTime++;
+}
+printf("Total time required: %d minutes\n\n", currentTime - 1);
+}
+int main() {
+int numPrinters;
+printf("Choose how many printers to use for simulation (1, 2, or 3): ");
+scanf("%d", &numPrinters);
+if (numPrinters < 1 || numPrinters > 3) {
+printf("Invalid choice! Please enter 1, 2, or 3.\n");
+return 1;
+}
+PrintSim(numPrinters);
+return 0;}
+9. WAP to create a Binary tree and perform non-recursive Preorder, Inorder and Postorder
+traversal on it.
+
+CODE:
+Inorder:
+#include<stdio.h>
+#include<stdlib.h>
+
+#define MAX 100
+
+struct node{
+    int data;
+    struct node* left;
+    struct node* right;
+};
+
+//func to create node
+struct node* createnode(int data){
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = data;
+    newnode->left= NULL;
+    newnode->right=NULL;
+
+    return newnode;
+}
+
+//stack stuff + push pop
+struct node* stack[MAX];
+int top = -1;
+
+void push(struct node* node){
+    if (top < MAX - 1) {
+        stack[++top]=node;
+    }
+}
+
+    struct node* pop() {
+        if (top >= 0)
+            return stack[top--];
+        return NULL;
+    }
+   
+    int stackEmpty() {
+        return top == -1;
+    }    
+
+//func to insert into nodes BST wale
+struct node* insert(struct node* root, int data){
+    if (root == NULL){
+         return createnode(data);}
+
+    if (data < root->data) {
+        root-> left = insert(root->left, data);
+    }
+
+    else if (data>root->data){
+        root-> right = insert(root->right, data);
+    }
+    return root;
+}
+
+void inorder(struct node* root) {
+    while (root != NULL || !stackEmpty()) {
+        while (root != NULL) {
+            push(root);
+            root = root->left;
+        }
+
+        root = pop();
+          printf(“%d “, root->data);
+        root = root->right;
+    }
+}
+int main() {
+    struct node* root = NULL;
+    int n, value;
+
+    printf(“Enter number of elements: “);
+    scanf(“%d”, &n);
+
+    printf(“Enter %d values: “, n);
+    for (int i = 0; i < n; i++) {
+        scanf(“%d”, &value);+
+        root = insert(root, value);
+    }
+
+    printf(“Inorder Traversal: “);
+    inorder(root);
+   
+    return 0;
+}
+
+Preorder:
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+struct node {
+    int data;
+    struct node* left;
+    struct node* right;
+};
+
+struct node* createnode(int data) {
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = data;
+    newnode->left = NULL;
+    newnode->right = NULL;
+    return newnode;
+}
+
+struct node* stack[MAX];
+int top = -1;
+
+void push(struct node* node) {
+    if (top < MAX - 1) {
+        stack[++top] = node;
+    }
+}
+
+struct node* pop() {
+    if (top >= 0)
+        return stack[top--];
+    return NULL;
+}
+
+int stackEmpty() {
+    return top == -1;
+}
+
+struct node* insert(struct node* root, int data) {
+    if (root == NULL) {
+        return createnode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+    return root;
+}
+
+void preorder(struct node* root) {
+    if (root == NULL) return;
+
+    push(root);
+
+    while (!stackEmpty()) {
+        root = pop();
+        printf(“%d “, root->data);
+
+        if (root->right) push(root->right);
+        if (root->left) push(root->left);
+    }
+}
+
+int main() {
+
+    struct node* root = NULL;
+    int n, value;
+
+    printf(“Enter number of elements: “);
+    scanf(“%d”, &n);
+
+    printf(“Enter %d values: “, n);
+    for (int i = 0; i < n; i++) {
+        scanf(“%d”, &value);
+        root = insert(root, value);
+    }
+
+    printf(“Preorder Traversal: “);
+    preorder(root);
+
+    return 0;
+}
+
+Postorder:
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+struct node {
+    int data;
+    struct node* left;
+    struct node* right;
+};
+
+struct node* createnode(int data) {
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = data;
+    newnode->left = NULL;
+    newnode->right = NULL;
+    return newnode;
+}
+
+struct node* stack1[MAX];
+struct node* stack2[MAX];
+int top1 = -1, top2 = -1;
+
+void push1(struct node* node) {
+    if (top1 < MAX - 1) {
+        stack1[++top1] = node;
+    }
+}
+
+struct node* pop1() {
+    if (top1 >= 0)
+        return stack1[top1--];
+
+    return NULL;
+}
+
+int stack1Empty() {
+    return top1 == -1;
+}
+
+void push2(struct node* node) {
+    if (top2 < MAX - 1) {
+        stack2[++top2] = node;
+    }
+}
+
+struct node* pop2() {
+    if (top2 >= 0)
+        return stack2[top2--];
+    return NULL;
+}
+
+int stack2Empty() {
+    return top2 == -1;
+}
+
+struct node* insert(struct node* root, int data) {
+    if (root == NULL) {
+        return createnode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+    return root;
+}
+
+void postorder(struct node* root) {
+    if (root == NULL) return;
+
+    push1(root);
+
+    while (!stack1Empty()) {
+        root = pop1();
+        push2(root);
+
+        if (root->left) push1(root->left);
+        if (root->right) push1(root->right);
+    }
+
+    while (!stack2Empty()) {
+        printf(“%d “, pop2()->data);
+    }
+}
+
+int main() {
+    struct node* root = NULL;
+
+    int n, value;
+
+    printf(“Enter number of elements: “);
+    scanf(“%d”, &n);
+
+    printf(“Enter %d values: “, n);
+    for (int i = 0; i < n; i++) {
+        scanf(“%d”, &value);
+        root = insert(root, value);
+    }
+
+    printf(“Postorder Traversal: “);
+    postorder(root);
+
+    return 0;
